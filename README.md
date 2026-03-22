@@ -1,3 +1,4 @@
+---
 title: AI Research Assistant Agent
 emoji: 🔬
 colorFrom: blue
@@ -14,7 +15,7 @@ An autonomous AI agent that researches any topic by searching the web,
 synthesising information from multiple sources, and producing a structured
 research report with citations — in under 60 seconds.
 
-**[Live Demo](https://huggingface.co/spaces/Divyavj1/ai-research-agent)**
+**[Live Demo](https://huggingface.co/spaces/Divyavj1/research-assistant-agent)**
 
 ---
 
@@ -65,3 +66,6 @@ streamlit run app.py
 Get free API keys at:
 - Groq: console.groq.com
 - Tavily: tavily.com
+
+---
+
