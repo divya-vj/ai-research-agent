@@ -33,14 +33,14 @@ def format_search_results(results):
         output.append(f"[Source {i}]")
         output.append(f"Title: {result['title']}")
         output.append(f"URL: {result['url']}")
-        output.append(f"Content: {result['content'][:300]}")
+        output.append(f"Content: {result['content'][:150]}")
         output.append("-" * 40)
     return "\n".join(output)
 
 
 # ── Tool ──────────────────────────────────────────────────────────────────
 def tavily_search_tool(query: str) -> str:
-    results = search_web(query, max_results=3)
+    results = search_web(query, max_results=2)
     return format_search_results(results)
 
 
@@ -157,12 +157,14 @@ def extract_report(result: dict) -> str:
 
     steps = result.get("intermediate_steps", [])
     best_report = ""
+
     for step in steps:
         if isinstance(step, tuple):
             for part in step:
                 part_str = str(part)
                 if "RESEARCH REPORT" in part_str:
                     start = part_str.find("## RESEARCH REPORT")
+                    candidate = part_str[start:]
                     candidate = candidate.replace('\\n', '\n')
                     if len(candidate) > len(best_report):
                         best_report = candidate
