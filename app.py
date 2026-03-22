@@ -181,7 +181,8 @@ if "report" in st.session_state:
 
     # Report display
     st.subheader(f"📄 Research Report")
-    st.markdown(report)
+    clean_report = report.replace('\\n', '\n')
+    st.markdown(clean_report)
 
     st.markdown("---")
 

@@ -176,15 +176,50 @@ def extract_report(result: dict) -> str:
 
 
 # ── Research Function ─────────────────────────────────────────────────────
-def research_topic(topic: str) -> str:
+def research_topic(topic: str, retry: bool = False) -> str:
+    """
+    Main function — takes a research topic and returns a structured report.
+    Automatically retries with smaller content if token limit is hit.
+    """
     print(f"\nStarting research on: {topic}")
     print("=" * 60)
 
-    executor = build_agent()
-    result = executor.invoke({"input": topic})
-    report = extract_report(result)
-    return report
+    try:
+        executor = build_agent()
+        result = executor.invoke({"input": topic})
+        report = extract_report(result)
+        return report
 
+    except Exception as e:
+        error_str = str(e)
+
+        # Handle token limit error — retry with smaller content
+        if "413" in error_str or "rate_limit" in error_str.lower():
+            if not retry:
+                print("Token limit hit — retrying with smaller content...")
+                # Temporarily reduce content size globally
+                import agent as self_module
+                original = self_module.format_search_results
+
+                def smaller_format(results):
+                    output = []
+                    if results.get("answer"):
+                        output.append(f"Summary: {results['answer'][:150]}")
+                    for i, r in enumerate(results["results"][:2], 1):
+                        output.append(f"[{i}] {r['title']}")
+                        output.append(f"URL: {r['url']}")
+                        output.append(f"{r['content'][:100]}")
+                        output.append("---")
+                    return "\n".join(output)
+
+                self_module.format_search_results = smaller_format
+                try:
+                    result = research_topic(topic, retry=True)
+                finally:
+                    self_module.format_search_results = original
+                return result
+
+        raise e
 
 # ── PDF Helper ────────────────────────────────────────────────────────────
 def _safe(text: str, max_len: int = 110) -> str:
